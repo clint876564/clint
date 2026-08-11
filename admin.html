@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Portfolio Admin</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #0b0b0b;
+      color: white;
+      min-height: 100vh;
+      padding: 30px 15px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #999;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: #151515;
+      border: 1px solid #292929;
+      border-radius: 18px;
+      padding: 25px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      background: #0d0d0d;
+      color: white;
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 18px;
+      outline: none;
+      font-size: 15px;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: white;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 14px 20px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .login-btn,
+    .save-btn {
+      background: white;
+      color: black;
+      width: 100%;
+    }
+
+    .logout-btn {
+      background: #222;
+      color: white;
+      margin-top: 15px;
+    }
+
+    .message {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      display: none;
+    }
+
+    .success {
+      background: #123d20;
+      color: #7cff9b;
+    }
+
+    .error {
+      background: #421717;
+      color: #ff8585;
+    }
+
+    #adminPanel {
+      display: none;
+    }
+
+    #loginPanel {
+      max-width: 450px;
+      margin: 80px auto;
+    }
+
+    .profile-preview {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .profile-preview img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #444;
+      display: none;
+      margin: 0 auto 15px;
+    }
+
+    .small {
+      color: #777;
+      font-size: 13px;
+      margin-top: -10px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LOGIN -->
+  <div id="loginPanel" class="container">
+
+    <div class="card">
+
+      <h1>Admin Login</h1>
+      <p class="subtitle">Manage your portfolio website</p>
+
+      <label>Email</label>
+      <input
+        type="email"
+        id="email"
+        placeholder="Your email"
+      >
+
+      <label>Password</label>
+      <input
+        type="password"
+        id="password"
+        placeholder="Your password"
+      >
+
+      <button class="login-btn" onclick="login()">
+        Login
+      </button>
+
+      <div id="loginMessage" class="message"></div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ADMIN PANEL -->
+  <div id="adminPanel" class="container">
+
+    <h1>Portfolio Admin</h1>
+    <p class="subtitle">
+      Edit your website without touching the code.
+    </p>
+
+    <div class="card">
+
+      <div class="profile-preview">
+        <img id="profilePreview" src="" alt="Profile">
+
+        <p id="previewText">
+          Profile picture preview
+        </p>
+      </div>
+
+      <label>Profile Picture URL</label>
+      <input
+        type="url"
+        id="profile_image"
+        placeholder="https://..."
+        oninput="updatePreview()"
+      >
+
+      <p class="small">
+        Paste a direct image URL.
+      </p>
+
+      <label>Name</label>
+      <input
+        type="text"
+        id="name"
+        placeholder="Your name"
+      >
+
+      <label>Professional Title</label>
+      <input
+        type="text"
+        id="title"
+        placeholder="Video Editor"
+      >
+
+      <label>Location</label>
+      <input
+        type="text"
+        id="location"placeholder="Lagos"
+      >
+
+      <label>Experience</label>
+      <input
+        type="text"
+        id="experience"
+        placeholder="5 YRS EXP"
+      >
+
+      <label>Availability</label>
+      <input
+        type="text"
+        id="availability"
+        placeholder="AVAILABLE"
+      >
+
+      <label>Bio</label>
+      <textarea
+        id="bio"
+        placeholder="Tell people about yourself..."
+      ></textarea>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2 style="margin-bottom:20px;">
+        Social Media
+      </h2>
+
+      <label>Instagram</label>
+      <input
+        type="url"
+        id="instagram"
+        placeholder="https://instagram.com/..."
+      >
+
+      <label>Twitter / X</label>
+      <input
+        type="url"
+        id="twitter"
+        placeholder="https://x.com/..."
+      >
+
+      <label>TikTok</label>
+      <input
+        type="url"
+        id="tiktok"
+        placeholder="https://tiktok.com/@..."
+      >
+
+    </div>
+
+
+    <div class="card">
+
+      <button
+        class="save-btn"
+        onclick="saveProfile()"
+      >
+        SAVE CHANGES
+      </button>
+
+      <div id="saveMessage" class="message"></div>
+
+      <button
+        class="logout-btn"
+        onclick="logout()"
+      >
+        Logout
+      </button>
+
+    </div>
+
+  </div>
+
+
+<script>
+
+  /* ==============================
+     SUPABASE CONNECTION
+  ============================== */
+
+  const SUPABASE_URL =
+    "https://bblobogsraomttvhkmbt.supabase.co";
+
+  const SUPABASE_KEY =
+    "sb_publishable_QTythwATWPkXCx8MgceeTw_xk0IN81b";
+
+  const supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+
+  /* ==============================
+     LOGIN
+  ============================== */
+
+  async function login() {
+
+    const email =
+      document.getElementById("email").value.trim();
+
+    const password =
+      document.getElementById("password").value;
+
+    const message =
+      document.getElementById("loginMessage");
+
+    if (!email || !password) {
+      showMessage(
+        message,
+        "Please enter your email and password.",
+        "error"
+      );
+      return;
+    }
+
+    const { data, error } =
+      await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+    if (error) {
+
+      showMessage(
+        message,
+        error.message,
+        "error"
+      );
+
+      return;
+    }
+
+    showAdmin();
+
+  }
+
+
+  /* ==============================
+     CHECK LOGIN
+  ============================== */
+
+  async function checkUser() {
+
+    const {
+      data: { session }
+    } = await supabaseClient.auth.getSession();
+
+    if (session) {
+      showAdmin();
+    }
+
+  }
+
+
+  /* ==============================
+     SHOW ADMIN
+  ============================== */
+
+  function showAdmin() {
+
+    document.getElementById("loginPanel").style.display =
+      "none";
+
+    document.getElementById("adminPanel").style.display =
+      "block";
+
+    loadProfile();
+
+  }
+
+
+  /* ==============================
+     LOAD PROFILE
+  ============================== */
+
+  async function loadProfile() {
+
+    const { data, error } =
+      await supabaseClient
+        .from("portfolio")
+        .select("*")
+        .limit(1)
+        .single();
+
+    if (error) {
+
+      console.error(error);
+
+      showMessage(
+        document.getElementById("saveMessage"),
+        "Could not load portfolio data.",
+        "error"
+      );
+
+      return;
+    }
+
+    if (!data) return;
+
+    document.getElementById("name").value =
+      data.name || "";
+
+    document.getElementById("title").value =
+      data.title || "";
+
+    document.getElementById("location").value =
+      data.location || "";
+
+    document.getElementById("experience").value =
+      data.experience || "";
+
+    document.getElementById("availability").value =
+      data.availability || "";
+
+    document.getElementById("bio").value =
+      data.bio || "";
+
+    document.getElementById("profile_image").value =
+      data.profile_image || "";
+
+    document.getElementById("instagram").value =
+      data.instagram || "";
+
+    document.getElementById("twitter").value =
+      data.twitter || "";
+
+    document.getElementById("tiktok").value =
+      data.tiktok || "";
+
+    updatePreview();
+
+  }
+
+
+  /* ==============================
+     SAVE PROFILE
+  ============================== */
+
+  async function saveProfile() {
+
+    const message =
+      document.getElementById("saveMessage");
+
+    const updatedData = {
+
+      name:
+        document.getElementById("name").value.trim(),
+
+      title:
+        document.getElementById("title").value.trim(),
+
+      location:
+        document.getElementById("location").value.trim(),
+
+      experience:
+        document.getElementById("experience").value.trim(),
+
+      availability:
+        document.getElementById("availability").value.trim(),
+
+      bio:
+        document.getElementById("bio").value.trim(),
+
+      profile_image:
+        document.getElementById("profile_image").value.trim(),
+
+      instagram:
+        document.getElementById("instagram").value.trim(),
+
+      twitter:
+        document.getElementById("twitter").value.trim(),
+
+      tiktok:
+        document.getElementById("tiktok").value.trim()
+
+    };
+
+
+    const { data, error } =
+      await supabaseClient
+        .from("portfolio")
+        .update(updatedData)
+        .eq("id", 1)
+        .select();
+
+    if (error) {
+
+      console.error(error);
+
+      showMessage(
+        message,
+        "Error saving: " + error.message,
+        "error"
+      );
+
+      return;
+    }
+
+
+    showMessage(
+      message,
+      "✓ Changes saved successfully!",
+      "success"
+    );
+
+  }
+
+
+  /* ==============================
+     PROFILE IMAGE PREVIEW
+  ============================== */
+
+  function updatePreview() {
+
+    const url =
+      document.getElementById("profile_image").value.trim();
+
+    const image =
+      document.getElementById("profilePreview");
+
+    const text =
+      document.getElementById("previewText");
+
+    if (url) {
+
+      image.src = url;
+      image.style.display = "block";
+      text.style.display = "none";
+
+    } else {
+
+      image.style.display = "none";
+      text.style.display = "block";
+
+    }
+
+  }
+
+
+  /* ==============================
+     LOGOUT
+  ============================== */
+
+  async function logout() {
+
+    await supabaseClient.auth.signOut();
+
+    document.getElementById("adminPanel").style.display =
+      "none";
+
+    document.getElementById("loginPanel").style.display =
+      "block";
+
+  }
+
+
+  /* ==============================
+     MESSAGE
+  ============================== */
+
+  function showMessage(element, text, type) {
+
+    element.textContent = text;
+
+    element.className =
+      "message " + type;
+
+    element.style.display =
+      "block";
+
+  }
+
+
+  /* ==============================
+     START
+  ============================== */
+
+  checkUser();
+
+</script>
+
+</body>
+</html>
